@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"os"
@@ -22,7 +23,7 @@ const (
 
 var (
 	version       = 1
-	inputImgPath  = filepath.FromSlash("./img/c.bmp")
+	inputImgPath  = filepath.FromSlash("./img/img.bmp")
 	outputImgPath = filepath.FromSlash("./img/inverted_img.bmp")
 )
 
@@ -83,20 +84,83 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 		case 1:
 			for r := 0; r < height; r++ {
 				for c := 0; c < width; c++ {
-
 					rgbArr[r][c].r = 255 - rgbArr0[r][c].r
 					rgbArr[r][c].g = 255 - rgbArr0[r][c].g
 					rgbArr[r][c].b = 255 - rgbArr0[r][c].b
 				}
 			}
+			break
+		case 2:
+			for r := 0; r < height; r++ {
+				for c := 0; c < width; c++ {
+					rgbArr[r][c].r = 255 - rgbArr0[r][c].r
+				}
+			}
+
+			for r := 0; r < height; r++ {
+				for c := 0; c < width; c++ {
+					rgbArr[r][c].g = 255 - rgbArr0[r][c].g
+				}
+			}
+			for r := 0; r < height; r++ {
+				for c := 0; c < width; c++ {
+					rgbArr[r][c].b = 255 - rgbArr0[r][c].b
+				}
+			}
+			break
+		case 3:
+			for c := 0; c < width; c++ {
+				for r := 0; r < height; r++ {
+					rgbArr[r][c].r = 255 - rgbArr0[r][c].r
+					rgbArr[r][c].g = 255 - rgbArr0[r][c].g
+					rgbArr[r][c].b = 255 - rgbArr0[r][c].b
+				}
+			}
+			break
+		case 4:
+			for r := 0; r < height; r++ {
+				for c := 0; c < width; c++ {
+					rgbArr[r][c].r = 255 - rgbArr0[r][c].r
+				}
+			}
+
+			for r := 0; r < height; r++ {
+				for c := 0; c < width; c++ {
+					rgbArr[r][c].g = 255 - rgbArr0[r][c].g
+					rgbArr[r][c].b = 255 - rgbArr0[r][c].b
+				}
+			}
+			break
+		case 5:
+			for r := 0; r < height; r += 2 {
+				for c := 0; c < width; c += 2 {
+					rgbArr[r][c].r = 255 - rgbArr0[r][c].r
+					rgbArr[r][c].g = 255 - rgbArr0[r][c].g
+					rgbArr[r][c].b = 255 - rgbArr0[r][c].b
+
+					rgbArr[r][c+1].g = 255 - rgbArr0[r][c+1].g
+					rgbArr[r][c+1].r = 255 - rgbArr0[r][c+1].r
+					rgbArr[r][c+1].b = 255 - rgbArr0[r][c+1].b
+
+					rgbArr[r+1][c].r = 255 - rgbArr0[r+1][c].r
+					rgbArr[r+1][c].g = 255 - rgbArr0[r+1][c].g
+					rgbArr[r+1][c].b = 255 - rgbArr0[r+1][c].b
+
+					rgbArr[r+1][c+1].r = 255 - rgbArr0[r+1][c+1].r
+					rgbArr[r+1][c+1].g = 255 - rgbArr0[r+1][c+1].g
+					rgbArr[r+1][c+1].b = 255 - rgbArr0[r+1][c+1].b
+				}
+			}
+			break
 		default:
 			break
 		}
 
 		stop := time.Now()
-		_ = stop.Sub(start)
+		elapsed := stop.Sub(start).Nanoseconds()
 
-		// fmt.Println(elapsed)
+		normalized := elapsed / int64(width*height)
+		fmt.Println(version, " : ", normalized)
 
 	}
 
@@ -122,27 +186,13 @@ func writeImg(version, height, width int, rgbArr0, rgbArr [][]rgb) error {
 }
 
 func main() {
-	invert(1, inputImgPath, outputImgPath)
-	// dat, _ := os.Open(inputImgPath)
-
-	// img, _ := bmp.Decode(dat)
-	// width := img.Bounds().Dx()
-	// height := img.Bounds().Dy()
-	// rgbArr := makeArray(height, width, img)
-
-	// upLeft := image.Point{0, 0}
-	// upRight := image.Point{width, height}
-	// nImg := image.NewRGBA(image.Rectangle{upLeft, upRight})
-
-	// for r := 0; r < height; r++ {
-	// 	for c := 0; c < width; c++ {
-	// 		color := color.RGBA{rgbArr[r][c].r, rgbArr[r][c].g, rgbArr[r][c].b, 255}
-	// 		nImg.Set(c, r, color)
-	// 	}
+	// err := invert(1, inputImgPath, outputImgPath)
+	// if err != nil {
+	// 	fmt.Println(err)
 	// }
 
-	// f, _ := os.Create(outputImgPath)
-
-	// bmp.Encode(f, nImg)
-
+	err := invert(2, inputImgPath, outputImgPath)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
